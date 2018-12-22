@@ -170,6 +170,12 @@ class InsCrawler(Logging):
             datetime = ele_datetime.get_attribute('datetime')
             dict_post['datetime'] = datetime
 
+            # Fetching likes
+            ele_div_span = browser.find_one('.eo2As .Nm9Fw')
+            ele_span = browser.find_one('span', ele_div_span)
+            likes = ele_span.text.replace(',', '')
+            dict_post['likes'] = int(likes)
+
             # Fetching all img
             content = None
             img_urls = set()
