@@ -174,7 +174,11 @@ class InsCrawler(Logging):
             ele_div_span = browser.find_one('.eo2As .Nm9Fw')
             ele_span = browser.find_one('span', ele_div_span)
             likes = ele_span.text.replace(',', '')
-            dict_post['likes'] = int(likes)
+
+            try:
+                dict_post['likes'] = int(likes)
+            except ValueError:
+                dict_post['likes'] = -1
 
             # Fetching all img
             content = None
