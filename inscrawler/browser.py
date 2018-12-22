@@ -1,4 +1,5 @@
 import os
+import shutil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,7 +19,7 @@ class Browser:
         chrome_options.add_argument("--window-size=768,920")
         chrome_options.add_argument("--no-sandbox")
         self.driver = webdriver.Chrome(
-            executable_path='%s/bin/chromedriver' % dir_path,
+            executable_path=shutil.which('chromedriver'),
             service_args=service_args,
             chrome_options=chrome_options)
         self.driver.implicitly_wait(5)
