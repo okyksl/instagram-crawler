@@ -161,66 +161,67 @@ class InsCrawler(Logging):
             check_next_post(cur_key)
             dict_post = {}
 
-            # Fetching datetime and url as key
-            ele_a_datetime = browser.find_one('.eo2As .c-Yi7')
-            cur_key = ele_a_datetime.get_attribute('href')
-            dict_post['key'] = cur_key
-
-            ele_datetime = browser.find_one('._1o9PC', ele_a_datetime)
-            datetime = ele_datetime.get_attribute('datetime')
-            dict_post['datetime'] = datetime
-
-            # Fetching likes
-            ele_div_span = browser.find_one('.eo2As .Nm9Fw')
-            ele_span = browser.find_one('span', ele_div_span)
-            likes = ele_span.text.replace(',', '')
-
             try:
+                # Fetching datetime and url as key
+                ele_a_datetime = browser.find_one('.eo2As .c-Yi7')
+                cur_key = ele_a_datetime.get_attribute('href')
+                dict_post['key'] = cur_key
+
+                ele_datetime = browser.find_one('._1o9PC', ele_a_datetime)
+                datetime = ele_datetime.get_attribute('datetime')
+                dict_post['datetime'] = datetime
+
+                # Fetching likes
+                ele_div_span = browser.find_one('.eo2As .Nm9Fw')
+                ele_span = browser.find_one('span', ele_div_span)
+                likes = ele_span.text.replace(',', '')
                 dict_post['likes'] = int(likes)
-            except ValueError:
-                dict_post['likes'] = -1
 
-            # Fetching all img
-            content = None
-            img_urls = set()
-            while True:
-                ele_imgs = browser.find('._97aPb img', waittime=10)
-                for ele_img in ele_imgs:
-                    if content is None:
-                        content = ele_img.get_attribute('alt')
-                    img_urls.add(ele_img.get_attribute('src'))
+                # Fetching all img
+                content = None
+                img_urls = set()
+                while True:
+                    ele_imgs = browser.find('._97aPb img', waittime=10)
+                    for ele_img in ele_imgs:
+                        if content is None:
+                            content = ele_img.get_attribute('alt')
+                        img_urls.add(ele_img.get_attribute('src'))
 
-                next_photo_btn = browser.find_one('._6CZji .coreSpriteRightChevron')
-                if next_photo_btn:
-                    next_photo_btn.click()
-                    sleep(0.2)
-                else:
-                    break
+                    next_photo_btn = browser.find_one('._6CZji .coreSpriteRightChevron')
+                    if next_photo_btn:
+                        next_photo_btn.click()
+                        sleep(0.2)
+                    else:
+                        break
 
-            dict_post['content'] = content
-            dict_post['img_urls'] = list(img_urls)
+                dict_post['content'] = content
+                dict_post['img_urls'] = list(img_urls)
 
-            # Fetching comments
-            ele_comments = browser.find('.eo2As .gElp9')[1:]
-            comments = []
-            for els_comment in ele_comments:
-                author = browser.find_one('.FPmhX', els_comment).text
-                comment = browser.find_one('span', els_comment).text
-                comments.append({
-                    'author': author,
-                    'comment': comment,
-                })
+                # Fetching comments
+                ele_comments = browser.find('.eo2As .gElp9')[1:]
+                comments = []
+                for els_comment in ele_comments:
+                    author = browser.find_one('.FPmhX', els_comment).text
+                    comment = browser.find_one('span', els_comment).text
+                    comments.append({
+                        'author': author,
+                        'comment': comment,
+                    })
 
-            if comments:
-                dict_post['comments'] = comments
+                if comments:
+                    dict_post['comments'] = comments
 
-            self.log(json.dumps(dict_post, ensure_ascii=False))
-            dict_posts[browser.current_url] = dict_post
+                self.log(json.dumps(dict_post, ensure_ascii=False))
+                dict_posts[browser.current_url] = dict_post
+            except:
+                print('Couldn\'t retrieve post correctly')
 
             pbar.update(1)
             left_arrow = browser.find_one('.HBoOv')
             if left_arrow:
                 left_arrow.click()
+            else:
+                break
 
         pbar.close()
         posts = list(dict_posts.values())
